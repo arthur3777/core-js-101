@@ -66,7 +66,7 @@ function getStringFromTemplate(firstName, lastName) {
  *   'Hello, Chuck Norris!' => 'Chuck Norris'
  */
 function extractNameFromTemplate(value) {
-  return value.slice(7, -1);
+  return value.match(/Hello,\s(.*)!/)[1];
 }
 
 
@@ -81,7 +81,7 @@ function extractNameFromTemplate(value) {
  *   'cat'       => 'c'
  */
 function getFirstChar(value) {
-  return value[0] || '';
+  return value[0];
 }
 
 /**
@@ -127,9 +127,7 @@ function repeatString(value, count) {
  *   'ABABAB','BA' => 'ABAB'
  */
 function removeFirstOccurrences(str, value) {
-  const firstMatch = str.search(value);
-
-  return str.slice(0, firstMatch) + str.slice(firstMatch + value.length);
+  return str.replace(new RegExp(`(.*)${value}(.*)$`), '$1$2');
 }
 
 /**
@@ -144,7 +142,7 @@ function removeFirstOccurrences(str, value) {
  *   '<a>' => 'a'
  */
 function unbracketTag(str) {
-  return str.slice(1, -1);
+  return str.match(/^.(.*).$/)[1];
 }
 
 
@@ -159,7 +157,7 @@ function unbracketTag(str) {
  *  'abcdefghijklmnopqrstuvwxyz' => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
  */
 function convertToUpperCase(str) {
-  return str.split('').map((letter) => letter.toUpperCase()).join('');
+  return str.toUpperCase();
 }
 
 /**
@@ -178,7 +176,7 @@ function convertToUpperCase(str) {
  *   'info@gmail.com' => ['info@gmail.com']
  */
 function extractEmails(str) {
-  return str.split(';');
+  return str.match(/([a-z0-9.]+@\w+\.com)/g);
 }
 
 /**
@@ -205,42 +203,20 @@ function extractEmails(str) {
  *
  */
 function getRectangleString(width, height) {
-  let out = '';
-  const chars = {
-    horisontal: '─',
-    topLeft: '┌',
-    topRight: '┐',
-    middleLeft: '│',
-    middleRight: '│',
-    bottomLeft: '└',
-    bottomRight: '┘',
-  };
-  const getChar = (position, column) => {
-    switch (column) {
-      case 1:
-        return chars[`${position}Left`];
-      case width:
-        return chars[`${position}Right`];
-      default:
-        return (position !== 'middle') ? chars.horisontal : ' ';
-    }
-  };
-
-  for (let line = 1; line <= height; line += 1) {
-    for (let column = 1; column <= width; column += 1) {
-      if (line === 1) {
-        out += getChar('top', column);
-      } else if (line === height) {
-        out += getChar('bottom', column);
-      } else {
-        out += getChar('middle', column);
-      }
-
-      if (column === width) out += '\n';
+  let txt = '';
+  for (let i = 0; i < height; i += 1) {
+    for (let j = 0; j < width; j += 1) {
+      if (i === 0 && j === 0) txt += '┌';
+      if (i === 0 && j === width - 1) txt += '┐';
+      if (i === height - 1 && j === width - 1) txt += '┘';
+      if (i === height - 1 && j === 0) txt += '└';
+      if ((i === height - 1 || i === 0) && j > 0 && j < width - 1) txt += '─';
+      if ((i > 0 && i < height - 1) && (j === 0 || j === width - 1)) txt += '│';
+      if ((i > 0 && i < height - 1) && (j > 0 && j < width - 1)) txt += ' ';
+      if (j === width - 1) txt += '\n';
     }
   }
-
-  return out;
+  return txt;
 }
 
 
@@ -261,12 +237,19 @@ function getRectangleString(width, height) {
  *
  */
 function encodeToRot13(str) {
-  const charIn = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-  const charOut = 'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm';
-
-  return str.split('')
-    .map((char) => ((charIn.includes(char)) ? charOut[charIn.search(char)] : char))
-    .join('');
+  // A-Z [65-90] and a-z [97-122]
+  let result = '';
+  let range = 0;
+  for (let i = 0; i < str.length; i += 1) {
+    const char = str.charCodeAt(i);
+    if (char >= 65 && char <= 90) range = 65;
+    if (char >= 97 && char <= 122) range = 97;
+    const symbol = char + (-1 * Math.trunc((char - range) / 13) * 26 + 13);
+    if (range !== 0) result += String.fromCharCode(symbol);
+    else result += str[i];
+    range = 0;
+  }
+  return result;
 }
 
 /**
@@ -312,12 +295,14 @@ function isString(value) {
  *   'K♠' => 51
  */
 function getCardId(value) {
-  const clubs = ['♣', '♦', '♥', '♠'];
-  const symbols = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-  const cardClubIndex = clubs.findIndex((club) => value.includes(club));
-  const cardSymbolIndex = symbols.findIndex((symbol) => value.includes(symbol));
-
-  return (cardClubIndex * symbols.length) + cardSymbolIndex;
+  const icon = ['♣', '♦', '♥', '♠'];
+  const letter = {
+    A: 0, J: 10, Q: 11, K: 12,
+  };
+  const firstPart = value.slice(0, -1);
+  const secondPart = value.substr(-1);
+  const num = Number.isNaN(Number(firstPart)) ? letter[firstPart] : Number(firstPart) - 1;
+  return num + icon.indexOf(secondPart) * 13;
 }
 
 
