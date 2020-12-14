@@ -1,11 +1,9 @@
-  
 /* *******************************************************************************************
  *                                                                                           *
  * Plese read the following tutorial before implementing tasks:                              *
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String   *
  *                                                                                           *
  ******************************************************************************************* */
-
 
 /**
  * Returns the result of concatenation of two strings.
@@ -19,10 +17,9 @@
  *   'aa',''    => 'aa'
  *   '',  'bb'  => 'bb'
  */
-function concatenateStrings(value1, value2) {
-  return value1 + value2;
+function concatenateStrings(val1, val2) {
+  return val1 + val2;
 }
-
 
 /**
  * Returns the length of given string.
@@ -35,8 +32,8 @@ function concatenateStrings(value1, value2) {
  *   'b'     => 1
  *   ''      => 0
  */
-function getStringLength(value) {
-  return value.length;
+function getStringLength(val) {
+  return val.length;
 }
 
 /**
@@ -67,10 +64,8 @@ function getStringFromTemplate(firstName, lastName) {
  *   'Hello, Chuck Norris!' => 'Chuck Norris'
  */
 function extractNameFromTemplate(value) {
-  const arr = value.split(' ');
-  return `${arr[1]} ${arr[2].slice(0, arr[2].length - 1)}`;
+  return value.slice(7, -1);
 }
-
 
 /**
  * Returns a first char of the given string.
@@ -82,8 +77,8 @@ function extractNameFromTemplate(value) {
  *   'John Doe'  => 'J'
  *   'cat'       => 'c'
  */
-function getFirstChar(value) {
-  return value[0];
+function getFirstChar(val) {
+  return val[0];
 }
 
 /**
@@ -97,8 +92,8 @@ function getFirstChar(value) {
  *   'cat'              => 'cat'
  *   '\tHello, World! ' => 'Hello, World!'
  */
-function removeLeadingAndTrailingWhitespaces(value) {
-  return value.trim();
+function removeLeadingAndTrailingWhitespaces(val) {
+  return val.trim();
 }
 
 /**
@@ -113,7 +108,11 @@ function removeLeadingAndTrailingWhitespaces(value) {
  *   'cat', 3 => 'catcatcat'
  */
 function repeatString(value, count) {
-  return value.repeat(count);
+  let result = '';
+  for (let i = 0; i < count; i += 1) {
+    result += value;
+  }
+  return result;
 }
 
 /**
@@ -144,9 +143,8 @@ function removeFirstOccurrences(str, value) {
  *   '<a>' => 'a'
  */
 function unbracketTag(str) {
-  return str.replace(/\W/g, '');
+  return str.slice(1, -1);
 }
-
 
 /**
  * Converts all characters of the specified string into the upper case
@@ -204,10 +202,16 @@ function extractEmails(str) {
  *             '└──────────┘\n'
  *
  */
-function getRectangleString(/* width, height */) {
-  throw new Error('Not implemented');
+function getRectangleString(width, height) {
+  let rect = `┌${'─'.repeat(width - 2)}┐\n`;
+  let h = height - 2;
+  while (h > 0) {
+    rect += `│${' '.repeat(width - 2)}│\n`;
+    h -= 1;
+  }
+  rect += `└${'─'.repeat(width - 2)}┘\n`;
+  return rect;
 }
-
 
 /**
  * Encode specified string with ROT13 cipher
@@ -226,7 +230,11 @@ function getRectangleString(/* width, height */) {
  *
  */
 function encodeToRot13(str) {
-  return (str).replace(/[a-zA-Z]/gi, (item) => String.fromCharCode(item.charCodeAt(0) + (item.toLowerCase() < 'n' ? 13 : -13)));
+  const input = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  const output = 'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm';
+  const index = (x) => input.indexOf(x);
+  const translate = (x) => (index(x) > -1 ? output[index(x)] : x);
+  return str.split('').map(translate).join('');
 }
 
 /**
@@ -242,8 +250,8 @@ function encodeToRot13(str) {
  *   isString('test') => true
  *   isString(new String('test')) => true
  */
-function isString(value) {
-  return (typeof value === 'string' || value instanceof String);
+function isString(val) {
+  return typeof val === 'string' || val instanceof String ? true : 0;
 }
 
 /**
@@ -271,31 +279,62 @@ function isString(value) {
  *   'K♠' => 51
  */
 function getCardId(value) {
-  const id = value.slice(0, value.length - 1);
-  const card = value.slice(value.length - 1);
-
-  let col;
-  let row;
-  if (id === 'A') {
-    col = 1;
-  } else if (id === 'J') {
-    col = 11;
-  } else if (id === 'Q') {
-    col = 12;
-  } else if (id === 'K') {
-    col = 13;
-  } else {
-    col = id;
-  }
-
-  if (card === '♣') row = 1;
-  if (card === '♦') row = 2;
-  if (card === '♥') row = 3;
-  if (card === '♠') row = 4;
-
-  return col - 1 + (row - 1) * 13;
+  const cards = [
+    'A♣',
+    '2♣',
+    '3♣',
+    '4♣',
+    '5♣',
+    '6♣',
+    '7♣',
+    '8♣',
+    '9♣',
+    '10♣',
+    'J♣',
+    'Q♣',
+    'K♣',
+    'A♦',
+    '2♦',
+    '3♦',
+    '4♦',
+    '5♦',
+    '6♦',
+    '7♦',
+    '8♦',
+    '9♦',
+    '10♦',
+    'J♦',
+    'Q♦',
+    'K♦',
+    'A♥',
+    '2♥',
+    '3♥',
+    '4♥',
+    '5♥',
+    '6♥',
+    '7♥',
+    '8♥',
+    '9♥',
+    '10♥',
+    'J♥',
+    'Q♥',
+    'K♥',
+    'A♠',
+    '2♠',
+    '3♠',
+    '4♠',
+    '5♠',
+    '6♠',
+    '7♠',
+    '8♠',
+    '9♠',
+    '10♠',
+    'J♠',
+    'Q♠',
+    'K♠',
+  ];
+  return cards.indexOf(value);
 }
-
 
 module.exports = {
   concatenateStrings,
