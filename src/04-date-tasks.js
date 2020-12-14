@@ -6,6 +6,7 @@
  *                                                                                           *
  ******************************************************************************************* */
 
+
 /**
  * Parses a rfc2822 string date representation into date value
  * For rfc2822 date specification refer to : http://tools.ietf.org/html/rfc2822#page-14
@@ -37,6 +38,7 @@ function parseDataFromIso8601(value) {
   return new Date(value);
 }
 
+
 /**
  * Returns true if specified date is leap year and false otherwise
  * Please find algorithm here: https://en.wikipedia.org/wiki/Leap_year#Algorithm
@@ -52,9 +54,9 @@ function parseDataFromIso8601(value) {
  *    Date(2015,1,1)    => false
  */
 function isLeapYear(date) {
-  const currentYear = date.getFullYear();
-  return (currentYear % 4 === 0 && currentYear % 100 !== 0) || currentYear % 400 === 0;
+  return new Date(date.getFullYear(), 2, 0).getDate() === 29;
 }
+
 
 /**
  * Returns the string represention of the timespan between two dates.
@@ -72,8 +74,9 @@ function isLeapYear(date) {
  *    Date(2000,1,1,10,0,0),  Date(2000,1,1,15,20,10,453)   => "05:20:10.453"
  */
 function timeSpanToString(startDate, endDate) {
-  return new Date(endDate - startDate).toJSON().substr(11, 12);
+  return new Date(Math.abs(endDate.getTime() - startDate.getTime())).toISOString().slice(11, -1);
 }
+
 
 /**
  * Returns the angle (in radians) between the hands of an analog clock
@@ -92,15 +95,13 @@ function timeSpanToString(startDate, endDate) {
  *    Date.UTC(2016,3,5,21, 0) => Math.PI/2
  */
 function angleBetweenClockHands(date) {
-  const dateTime = new Date(date);
-  const hour = dateTime.getUTCHours() % 12;
-  const minute = dateTime.getUTCMinutes();
-  const hourAngle = (360 / 12) * hour + (360 / (12 * 60)) * minute;
-  const minuteAngle = (360 / 60) * minute;
-  let angle = Math.abs(hourAngle - minuteAngle);
-  angle = angle > 180 ? angle % 180 : angle;
-  return (angle * Math.PI) / 180;
+  let degrees = (30 * date.getUTCHours()) - (5.5 * date.getUTCMinutes());
+
+  if (degrees > 360) degrees %= 360;
+
+  return Math.abs((Math.PI / 180) * Math.min(360 - degrees, degrees));
 }
+
 
 module.exports = {
   parseDataFromRfc2822,

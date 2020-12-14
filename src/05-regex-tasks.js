@@ -32,7 +32,9 @@
  * @return {RegExp}
  */
 function getRegexForGuid() {
-  return /^{[\da-f]{8}(-[\da-f]{4}){3}-[\da-f]{12}}$/i;
+  const symbols = '[0-9a-fA-F]';
+
+  return new RegExp(`{${symbols}{8}-${symbols}{4}-${symbols}{4}-${symbols}{4}-${symbols}{12}}`);
 }
 
 
@@ -54,7 +56,7 @@ function getRegexForGuid() {
  *
  */
 function getRegexForPitSpot() {
-  return /p.t/;
+  return new RegExp(/^(pi|s|r)/);
 }
 
 
@@ -79,7 +81,10 @@ function getRegexForPitSpot() {
  *   'Pa55'.match(validator) => false
  */
 function getPasswordValidator(minLength) {
-  return new RegExp(`^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{${minLength},}$`);
+  const block = '[a-zA-Z0-9]';
+  const pattern = `^(?=${block}*[0-9])(?=${block}*[a-z])(?=${block}*[A-Z])${block}{${minLength},}$`;
+
+  return new RegExp(pattern);
 }
 
 
